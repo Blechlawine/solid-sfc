@@ -1,5 +1,5 @@
-import { findStaticImports } from "mlly";
-import { basename } from "pathe";
+import { compileComponent } from "./compiler";
+import { parse } from "./parser";
 import { Plugin } from "vite";
 
 type Config = {};
@@ -10,32 +10,17 @@ export default function vitePlugin(config?: Config): Plugin {
         enforce: "pre",
         transform(code, id) {
             if (id.endsWith(".solid")) {
-                const scriptPart = code.match(/<script +lang *= *"ts">(.*)<\/script>/s);
-                const templatePart = code.match(/<template +lang *= *"tsx">(.*)<\/template>/s);
-                if (!scriptPart || !templatePart) return null;
+                const parsed = parse(code);
+                if (!parsed) return null;
+                const { script, template } = parsed;
 
-                console.log("SCRIPT:", scriptPart[1]);
-                console.log("TEMPLATE:", templatePart[1]);
-                const imports = findStaticImports(scriptPart[1]);
+                console.log("SCRIPT:", script);
+                console.log("TEMPLATE:", template);
 
-                const componentName = basename(id).replace(".solid", "");
+                const compiled = compileComponent(script, template, id);
 
-                const scriptPartWithoutImports = scriptPart[1].substring(
-                    Math.max(...imports.map((i) => i.end)),
-                );
-
-                const compiledCode = `
-                ${imports.map((i) => i.code).join("\n")}
-                function ${componentName}() {
-                    ${scriptPartWithoutImports}
-                    return (
-                        ${templatePart[1]}
-                    );\
-                }
-                export default ${componentName};
-                `;
                 return {
-                    code: compiledCode,
+                    code: compiled,
                 };
             }
         },
