@@ -11,7 +11,7 @@ export default function vitePlugin(config?: Config): Plugin {
         transform(code, id) {
             if (id.endsWith(".solid")) {
                 const scriptPart = code.match(/<script +lang *= *"ts">(.*)<\/script>/s);
-                const templatePart = code.match(/<template>(.*)<\/template>/s);
+                const templatePart = code.match(/<template +lang *= *"tsx">(.*)<\/template>/s);
                 if (!scriptPart || !templatePart) return null;
 
                 console.log("SCRIPT:", scriptPart[1]);
@@ -30,7 +30,7 @@ export default function vitePlugin(config?: Config): Plugin {
                     ${scriptPartWithoutImports}
                     return (
                         ${templatePart[1]}
-                    );
+                    );\
                 }
                 export default ${componentName};
                 `;

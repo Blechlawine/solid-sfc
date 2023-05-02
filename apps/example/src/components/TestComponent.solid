@@ -1,13 +1,13 @@
-<template>
+<template lang="tsx">
     <div>
         Hello world
-        {test}
+        {test()}
     </div>
 </template>
 <script lang="ts">
 import { createSignal } from "solid-js";
 
-const test = createSignal("asdasd");
+const [test, setTest] = createSignal("asdasd");
 </script>
 <style scoped>
 

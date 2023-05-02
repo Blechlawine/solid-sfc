@@ -4,7 +4,11 @@ import { defineConfig } from "vite";
 import inspect from "vite-plugin-inspect";
 
 export default defineConfig({
-    plugins: [sfc(), solid({
-        extensions: [".solid"],
-    }), inspect()],
+    plugins: [
+        sfc(),
+        solid({
+            extensions: [".solid"],
+        }),
+        inspect(),
+    ],
 });
