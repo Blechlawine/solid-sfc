@@ -1,5 +1,5 @@
 <template lang="tsx">
-    <div>
+    <div class="test">
         Hello world
         {test()}
     </div>
@@ -9,6 +9,8 @@ import { createSignal } from "solid-js";
 
 const [test, setTest] = createSignal("asdasd");
 </script>
-<style scoped>
-
+<style>
+.test {
+    color: red;
+}
 </style>
