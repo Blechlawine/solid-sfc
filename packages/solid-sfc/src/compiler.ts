@@ -20,7 +20,7 @@ export function compileComponent(
         ${scriptPartWithoutImports}
         return (
             ${template}
-        );\
+        );
     }
     export default ${componentName};
     `;
