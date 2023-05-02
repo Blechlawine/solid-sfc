@@ -12,6 +12,7 @@ export default function vitePlugin(config?: Config): Plugin {
         name: "solid-sfc",
         enforce: "pre",
         resolveId(id, importer, options) {
+            // resolveId just says: "hey yes i can give you this module"
             if (vfs.has(id)) {
                 return id;
             }
@@ -38,6 +39,7 @@ export default function vitePlugin(config?: Config): Plugin {
             }
         },
         load(id) {
+            // load says: "heres the content of this module"
             if (vfs.has(id)) {
                 return vfs.get(id);
             }
