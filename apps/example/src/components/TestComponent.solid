@@ -1,0 +1,14 @@
+<template>
+    <div>
+        Hello world
+        {test}
+    </div>
+</template>
+<script lang="ts">
+import { createSignal } from "solid-js";
+
+const test = createSignal("asdasd");
+</script>
+<style scoped>
+
+</style>
