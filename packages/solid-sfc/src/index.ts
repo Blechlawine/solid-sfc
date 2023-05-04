@@ -1,46 +1,55 @@
 import { compileComponent } from "./compiler";
 import { parse } from "./parser";
-import { virtualStyleModuleId } from "./utils";
+import { createSfcId, parseRequest, virtualStyleModuleId } from "./utils";
 import { Plugin } from "vite";
+
+export * from "./runtime";
 
 type Config = {};
 
 export default function vitePlugin(config?: Config): Plugin {
+    const vfsStyles = new Map<string, string>();
     const vfs = new Map<string, string>();
-
     return {
         name: "solid-sfc",
         enforce: "pre",
         resolveId(id, importer, options) {
-            // resolveId just says: "hey yes i can give you this module"
-            if (vfs.has(id)) {
+            // resolveId just says: "hey yes i can give you this module, if you ask for this specific name"
+            const parsedId = parseRequest(id);
+            if (vfsStyles.has(id)) {
+                return id;
+            } else if (parsedId.query.solidSfc != null) {
                 return id;
             }
         },
         transform(code, id) {
-            if (id.endsWith(".solid")) {
-                const parsed = parse(code);
-                if (!parsed) return null;
-                const { script, template, style } = parsed;
+            const parsedId = parseRequest(id);
+            if (!id.endsWith(".solid") || parsedId.query.solidSfc != null) return null;
 
-                console.log("SCRIPT:", script);
-                console.log("TEMPLATE:", template);
-                console.log("STYLE:", style);
+            // console.log("ParsedID:", parsedId);
 
-                const compiled = compileComponent(script, template, style, id);
+            const parsed = parse(code);
+            if (!parsed) return null;
 
-                if (style) {
-                    vfs.set(virtualStyleModuleId(id), style);
-                }
+            const compiled = compileComponent(parsed, id);
 
-                return {
-                    code: compiled,
-                };
+            if (parsed.style) {
+                vfsStyles.set(virtualStyleModuleId(id), parsed.style);
             }
+
+            const vfsId = createSfcId(id);
+            vfs.set(vfsId, compiled);
+
+            return {
+                code: `import _Component from "${vfsId}";
+                export default _Component;`,
+            };
         },
         load(id) {
             // load says: "heres the content of this module"
-            if (vfs.has(id)) {
+            if (vfsStyles.has(id)) {
+                return vfsStyles.get(id);
+            } else if (vfs.has(id)) {
                 return vfs.get(id);
             }
             return null;

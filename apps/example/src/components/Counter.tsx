@@ -9,7 +9,7 @@ export default function Counter() {
             <button class="increment" onClick={() => setCount(count() + 1)}>
                 Clicks: {count()}
             </button>
-            <TestComponent />
+            <TestComponent msg="Hello" />
         </>
     );
 }
